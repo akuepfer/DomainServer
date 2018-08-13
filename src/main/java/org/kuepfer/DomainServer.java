@@ -41,8 +41,8 @@ import static io.undertow.servlet.Servlets.defaultContainer;
 public class DomainServer {
 
     public static final String ROOT_DIRECTORY   = "/home/armin/ws/DomainServer/root/";
-    public static final String MY_PORTFOLIO     = "/home/armin/ws/MyPortfolio/app/";
-    public static final String MOVE_MOUNTAINTS  = "/home/armin/ws/MaterializeCss/app/";
+    public static final String MY_WORKSPACE     = "/home/armin/ws/MyWorkspace/app/";
+    public static final String MOVE_MOUNTAINTS  = "/home/armin/ws/MoveMountains/app/";
     private static final char[] STORE_PASSWORD  = "password".toCharArray();
 
     /**
@@ -72,7 +72,7 @@ public class DomainServer {
         /*
          * Serve directory /portfolio
          */
-        ResourceHandler portfolioHandler = resource(new PathResourceManager(Paths.get(MY_PORTFOLIO), 100))
+        ResourceHandler workspaceHandler = resource(new PathResourceManager(Paths.get(MY_WORKSPACE), 100))
                 .setDirectoryListingEnabled(false);
 
 
@@ -112,7 +112,7 @@ public class DomainServer {
         PathHandler pathHandler = Handlers.path()
                 .addPrefixPath("/", rootFileHandler)
                 .addPrefixPath("/berge-versetzen", resourceHandler)
-                .addPrefixPath("/portfolio", portfolioHandler);
+                .addPrefixPath("/workspace", workspaceHandler);
 
         SSLContext sslContext = createSSLContext(loadKeyStore("server.keystore"), loadKeyStore("server.truststore"));
 
