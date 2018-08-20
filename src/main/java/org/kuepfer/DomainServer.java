@@ -41,7 +41,7 @@ import static io.undertow.servlet.Servlets.defaultContainer;
 public class DomainServer {
 
     public static final String ROOT_DIRECTORY   = "/home/armin/ws/DomainServer/root/";
-    public static final String MY_WORKSPACE     = "/home/armin/ws/MyWorkspace/app/";
+    public static final String MY_WORKSPACE     = "/home/armin/ws/MyWorkspace/src/";
     public static final String MOVE_MOUNTAINTS  = "/home/armin/ws/MoveMountains/app/";
     private static final char[] STORE_PASSWORD  = "password".toCharArray();
 
@@ -84,13 +84,27 @@ public class DomainServer {
         CachingResourceManager cachingResourceManager = new CachingResourceManager(100, 10000, null, resourceManager, -1);
 
 
+
+        /*Predicates.parse("max-content-size[5]")*/
+
+        Predicate allContent = Predicates.truePredicate();
+
+        Predicate compressedAndCachedPredicate = Predicates.or(
+                Predicates.prefix("css/"),
+                Predicates.prefix("fonts/"),
+                Predicates.prefix("img/"),
+                Predicates.prefix("js/"),
+                Predicates.prefix("pdf/"));
+
         /**
          * Enable content encoding (compression)
          */
+
+
         Path pathRoot = Paths.get(MOVE_MOUNTAINTS);
         ContentEncodingRepository contentEncodingRepository =
                 new ContentEncodingRepository().addEncodingHandler("gzip", new GzipEncodingProvider(), 50,
-                        Predicates.truePredicate()    /*Predicates.parse("max-content-size[5]")*/);
+                        compressedAndCachedPredicate);
 
         int minResourceSize = 0;
         int maxResourceSize = 100000;
@@ -101,13 +115,14 @@ public class DomainServer {
                 minResourceSize, maxResourceSize, encodingAllowed);
 
         /**
-         * Enable caching of 8 days
+         * Enable caching of 8 days, for css/ fonts/ img/ js/ pdf/
+         * --> reduce time for development to 1 minute
          */
         ResourceHandler resourceHandler = new ResourceHandler(resourceManager)
                 .setDirectoryListingEnabled(false)
-                .setCachable(Predicates.truePredicate())
+                .setCachable(compressedAndCachedPredicate)
                 .setContentEncodedResourceManager(contentEncodedResourceManager)
-                .setCacheTime(8 * 24 * 60 * 60);
+                .setCacheTime(/*8 * 24 * 60 * */ 60);
 
         PathHandler pathHandler = Handlers.path()
                 .addPrefixPath("/", rootFileHandler)
@@ -120,12 +135,12 @@ public class DomainServer {
         /**
          * To dump header use this request handler.
          */
-        RequestDumpingHandler requestDumpingHandler = new RequestDumpingHandler(resourceHandler);
+        RequestDumpingHandler requestDumpingHandler = new RequestDumpingHandler(pathHandler);
 
         Undertow optimizedServer = Undertow.builder()
                 .addHttpsListener(httpsPort, "0.0.0.0", sslContext)
                 .setHandler(pathHandler)
-                // .setHandler(requestDumpingHandler)
+                //.setHandler(requestDumpingHandler)
                 .build();
         optimizedServer.start();
 
