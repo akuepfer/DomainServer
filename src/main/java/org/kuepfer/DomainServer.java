@@ -90,11 +90,13 @@ public class DomainServer {
         Predicate allContent = Predicates.truePredicate();
 
         Predicate compressedAndCachedPredicate = Predicates.or(
-                Predicates.prefix("css/"),
-                Predicates.prefix("fonts/"),
-                Predicates.prefix("img/"),
-                Predicates.prefix("js/"),
-                Predicates.prefix("pdf/"));
+                Predicates.suffix(".css"),
+                Predicates.suffix(".woff2"),
+                Predicates.suffix(".jpg"),
+                Predicates.suffix(".jpeg"),
+                Predicates.suffix(".png"),
+                Predicates.suffix(".js"),
+                Predicates.suffix(".pdf"));
 
         /**
          * Enable content encoding (compression)
