@@ -90,13 +90,11 @@ public class DomainServer {
         Predicate allContent = Predicates.truePredicate();
 
         Predicate compressedAndCachedPredicate = Predicates.or(
-                Predicates.suffix(".css"),
-                Predicates.suffix(".woff2"),
-                Predicates.suffix(".jpg"),
-                Predicates.suffix(".jpeg"),
-                Predicates.suffix(".png"),
-                Predicates.suffix(".js"),
-                Predicates.suffix(".pdf"));
+                Predicates.prefix("/css"),
+                Predicates.prefix("/font"),
+                Predicates.prefix("/img"),
+                Predicates.prefix("/js"),
+                Predicates.prefix("/pdf"));
 
         /**
          * Enable content encoding (compression)
@@ -106,7 +104,7 @@ public class DomainServer {
         Path pathRoot = Paths.get(MOVE_MOUNTAINTS);
         ContentEncodingRepository contentEncodingRepository =
                 new ContentEncodingRepository().addEncodingHandler("gzip", new GzipEncodingProvider(), 50,
-                        compressedAndCachedPredicate);
+                        allContent);
 
         int minResourceSize = 0;
         int maxResourceSize = 100000;
